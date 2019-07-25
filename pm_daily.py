@@ -343,6 +343,6 @@ def file_handler(_file):
         else:
             print(u"该文档【%s】已导入系统！" % _short_file)
 
-    return {"OK": True, "INFO": u"日报数据导入库中。"}
+    return {"OK": True, "INFO": u"完成导入"}
 
 #

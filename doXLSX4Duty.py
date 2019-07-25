@@ -250,7 +250,7 @@ def main(filename):
     try:
         _count = doList(xlsx_handler)
         # print("%s- Done" % time.ctime())
-        return {"OK": True, "INFO": "%d" % _count}
+        return {"OK": True, "INFO": u"导入%d条数据" % _count}
 
     except Exception, e:
         print e

@@ -249,7 +249,7 @@ def doList(xlsx_handler, mongodb, _table, _op, _ncol):
                     print '.',
 
         print "[", _count, "]"
-        return {"OK": True, "INFO": "%d" % _count}
+        return {"OK": True, "INFO": u"导入%d条数据" % _count}
 
 
 def main(filename):

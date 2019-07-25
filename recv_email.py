@@ -16,6 +16,7 @@ from datetime import datetime, date, timedelta
 import pm_daily
 import star_task
 import duty
+import send_email
 
 rx_msg_list = []
 
@@ -100,6 +101,7 @@ def parser_content(msg, _cr_date, _sender, _subject):
 
             if "chinacloud.com.cn" in _sender:
                 """是公司内部邮件"""
+                _ret = None
                 if u"项目日报" in f_name and "doc" in f_name:
                     print "pm_daily.file_handler:",f_name
                     _ret = pm_daily.file_handler("files/%s" % f_name)
@@ -109,9 +111,9 @@ def parser_content(msg, _cr_date, _sender, _subject):
                     _ret = duty.file_handler("files/%s" % f_name)
                 else:
                     print u"Subject: %s" % _subject
-                    _ret = {"OK": False, "INFO": u"日报数据无效，未能导入！"}
-                """定义邮件回复信息"""
-                rx_msg_list.append({"sender": _sender, "subject": _subject, "date": _cr_date, "ret": _ret})
+                if _ret is not None:
+                    """定义邮件回复信息"""
+                    rx_msg_list.append({"sender": _sender, "subject": _subject, "date": _cr_date, "ret": _ret})
         else:
             _datas = par.get_payload(decode=True)
             if _datas is None:
@@ -180,11 +182,30 @@ for _idx in range(_index, 0, -1):
                         break
 
     print("-"*80)
-    for _msg in rx_msg_list:
-        print _msg
-
 
 # 关闭连接
 server.quit()
- 
+
+for _msg in rx_msg_list:
+
+    if "ret" in _msg:
+        if _msg["ret"]["OK"]:
+            _text = "邮件 <%s>@<%s> 的附件数据已被自动导入，处理结果：<%s>" % (
+                _msg["subject"], _msg["date"], _msg["ret"]["INFO"])
+        else:
+            _text = "错误提示：邮件 <%s>@<%s> 的附件数据未被导入，原因：<%s>" % (
+                _msg["subject"], _msg["date"], _msg["ret"]["INFO"])
+
+        mail = {
+            "Smtp_Server": "smtp.chinacloud.com.cn",
+            "Smtp_Password": sys.argv[1],
+            "Receivers": [_msg["sender"], "shenwei@chinacloud.com.cn"],
+            "Msg_Title": "An Auto-Reply email by R&D MIS",
+            "Smtp_Sender": "shenwei@chinacloud.com.cn",
+            "From": "shenwei_from@chinacloud.com.cn",
+            "To": _msg["sender"],
+            "Text": _text
+        }
+        send_email.EmailClass(mail).send()
+
 #

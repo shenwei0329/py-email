@@ -2,7 +2,6 @@
 
 import sys
 import doXLSX4Duty
-import json
 import locale
 
 # from __future__ import unicode_literals
