@@ -146,6 +146,11 @@ resp, mails, octets = server.list()
 _index = len(mails)
 _err = False
 
+f = open('email_hash.txt', 'r')
+hash_list = f.read()
+f.close()
+_need_rewrite = False
+
 for _idx in range(_index, 0, -1):
 
     # print(u"第%d封邮件：\n" % _idx)
@@ -178,7 +183,12 @@ for _idx in range(_index, 0, -1):
                     _date = parser_date(msg)
                     if _date >= _arg_date:
                         """收取正文和附件"""
-                        parser_content(msg, _date, _sender, _subject)
+                        _text = u"%s-%s-%s-%s" % (_name, _sender, _subject, _date)
+                        _hex = hashlib.md5(_text.encode("utf-8")).hexdigest()
+                        if _hex not in hash_list:
+                            parser_content(msg, _date, _sender, _subject)
+                            hash_list += "%s\n" % _hex
+                            _need_rewrite = True
                     else:
                         break
 
@@ -187,11 +197,10 @@ for _idx in range(_index, 0, -1):
 # 关闭连接
 server.quit()
 
-f = open('email_hash.txt', 'r')
-hash_list = f.read()
-f.close()
-
-_need_rewrite = False
+if _need_rewrite:
+    f = open('email_hash.txt', 'w')
+    f.write(hash_list)
+    f.close()
 
 for _msg in rx_msg_list:
 
@@ -203,27 +212,18 @@ for _msg in rx_msg_list:
             _text = "错误提示：邮件 <%s>@<%s> 的附件数据未被导入，原因：<%s>" % (
                 _msg["subject"], _msg["date"], _msg["ret"]["INFO"])
 
-        _hex = hashlib.md5(_text.encode("utf-8")).hexdigest()
-        if _hex not in hash_list:
-            mail = {
-                "Smtp_Server": "smtp.chinacloud.com.cn",
-                "Smtp_Password": sys.argv[1],
-                "Receivers": [_msg["sender"], "shenwei@chinacloud.com.cn"],
-                "Msg_Title": "An Auto-Reply email by R&D MIS",
-                "Smtp_Sender": "shenwei@chinacloud.com.cn",
-                "From": "shenwei@chinacloud.com.cn",
-                "To": _msg["sender"],
-                "Text": _text
-            }
-            send_email.EmailClass(mail).send()
-            print "need to send it!"
+        mail = {
+            "Smtp_Server": "smtp.chinacloud.com.cn",
+            "Smtp_Password": sys.argv[1],
+            "Receivers": [_msg["sender"], "shenwei@chinacloud.com.cn"],
+            "Msg_Title": "An Auto-Reply email by R&D MIS",
+            "Smtp_Sender": "shenwei@chinacloud.com.cn",
+            "From": "shenwei@chinacloud.com.cn",
+            "To": _msg["sender"],
+            "Text": _text
+        }
+        send_email.EmailClass(mail).send()
+        print "need to send it!"
 
-            hash_list += "%s\n" % _hex
-            _need_rewrite = True
-
-if _need_rewrite:
-    f = open('email_hash.txt', 'w')
-    f.write(hash_list)
-    f.close()
 
 #
