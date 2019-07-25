@@ -236,6 +236,7 @@ def doList(xlsx_handler):
         print ".",
 
     print "\n[", _count, "]", "(", xlsx_handler.getNrows(), ")"
+    return _count
 
 
 def main(filename):
@@ -247,14 +248,14 @@ def main(filename):
     xlsx_handler = XlsxHandler(filename)
 
     try:
-        doList(xlsx_handler)
-        print("%s- Done" % time.ctime())
-        return True
+        _count = doList(xlsx_handler)
+        # print("%s- Done" % time.ctime())
+        return {"OK": True, "INFO": "%d" % _count}
 
     except Exception, e:
         print e
         # print("%s- Done[Nothing to do]" % time.ctime())
-        return False
+        return {"OK": False, "INFO": "%s" % e}
 
 
 if __name__ == '__main__':

@@ -30,13 +30,15 @@ def file_handler(_file):
     if ('.xlsx' in _short_file) and\
             ('~$' not in _short_file) and\
             (u'考勤报表'.encode(locale.getdefaultlocale()[1]) in _short_file):
-        doXLSX4Duty.main(_file)
+        _ret = doXLSX4Duty.main(_file)
         file_list += _short_file
     else:
-        print "Invalid file name: ", _short_file
-        return
+        # print "Invalid file name: ", _short_file
+        return {"OK": False, "INFO": "invalid file name"}
 
     f = open('duty_file.txt', 'w')
     f.write(file_list)
     f.close()
+
+    return _ret
 

@@ -15,6 +15,9 @@ import sys
 from datetime import datetime, date, timedelta
 import pm_daily
 import star_task
+import duty
+
+rx_msg_list = []
 
 
 def parser_date(msg):
@@ -75,6 +78,8 @@ def parser_content(msg, _cr_date, _sender, _subject):
     :param _sender: 发信人（用于文件命名）
     :return:
     """
+    global rx_msg_list
+
     for par in msg.walk():
         name = par.get_param("name")
         if name:
@@ -92,15 +97,21 @@ def parser_content(msg, _cr_date, _sender, _subject):
                 f = open("files/%s-%s-ref" % (_cr_date, _sender), "wb")
             f.write(data)
             f.close()
+
             if "chinacloud.com.cn" in _sender:
+                """是公司内部邮件"""
                 if u"项目日报" in f_name and "doc" in f_name:
                     print "pm_daily.file_handler:",f_name
-                    pm_daily.file_handler("files/%s" % f_name)
-                elif _subject in [u"代码提交"]:
-                    star_task.file_handler("files/%s" % f_name)
+                    _ret = pm_daily.file_handler("files/%s" % f_name)
+                elif _subject in [u"代码提交", u"项目经理", u"需求", u"北区运维"]:
+                    _ret = star_task.file_handler("files/%s" % f_name)
+                elif _subject in [u"考勤"]:
+                    _ret = duty.file_handler("files/%s" % f_name)
                 else:
                     print u"Subject: %s" % _subject
-
+                    _ret = {"OK": False, "INFO": u"日报数据无效，未能导入！"}
+                """定义邮件回复信息"""
+                rx_msg_list.append({"sender": _sender, "subject": _subject, "date": _cr_date, "ret": _ret})
         else:
             _datas = par.get_payload(decode=True)
             if _datas is None:
@@ -131,7 +142,8 @@ resp, mails, octets = server.list()
 
 _index = len(mails)
 _err = False
-for _idx in range(_index,0,-1):
+
+for _idx in range(_index, 0, -1):
 
     # print(u"第%d封邮件：\n" % _idx)
     # print("="*80)
@@ -168,7 +180,10 @@ for _idx in range(_index,0,-1):
                         break
 
     print("-"*80)
- 
+    for _msg in rx_msg_list:
+        print _msg
+
+
 # 关闭连接
 server.quit()
  

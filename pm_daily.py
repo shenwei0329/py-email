@@ -49,7 +49,7 @@ def file_handler(_file):
 
     if ('.docx' not in _short_file) and ('.doc' in _short_file):
         print "Invalid file name: ", _short_file
-        return
+        return {"OK": False, "INFO": "invalid file name"}
     else:
 
         mongo_db = mongodb_class.mongoDB('PM_DAILY')
@@ -110,7 +110,7 @@ def file_handler(_file):
                                                                })
                             else:
                                 print(u"文档正文【目标】格式错误！")
-                                return
+                                return {"OK": False, "INFO": u"文档正文【目标】格式错误！"}
                             _total_target_lvl += 0.1
                         else:
                             if len(_params) == 4:
@@ -131,13 +131,13 @@ def file_handler(_file):
                                                                })
                             else:
                                 print(u"文档正文【目标】格式错误！")
-                                return
+                                return {"OK": False, "INFO": u"文档正文【目标】格式错误！"}
 
                     elif _heading_lvl == 2:
 
                         if para.style.name in "List Paragraph":
                             print(u"文档正文【阶段目标】格式错误！")
-                            return
+                            return {"OK": False, "INFO": u"文档正文【阶段目标】格式错误！"}
 
                         if 'stage_target' not in _daily:
                             _daily['stage_target'] = []
@@ -176,7 +176,7 @@ def file_handler(_file):
 
                         if para.style.name in "List Paragraph":
                             print(u"文档正文【今日工作汇报】格式错误！")
-                            return
+                            return {"OK": False, "INFO": u"文档正文【阶段目标】格式错误！"}
 
                         if 'today' not in _daily:
                             _daily['today'] = []
@@ -192,7 +192,7 @@ def file_handler(_file):
 
                         if para.style.name in "List Paragraph":
                             print(u"文档正文【明日工作计划】格式错误！")
-                            return
+                            return {"OK": False, "INFO": u"文档正文【明日工作计划】格式错误！"}
 
                         if 'tomorrow' not in _daily:
                             _daily['tomorrow'] = []
@@ -343,4 +343,6 @@ def file_handler(_file):
         else:
             print(u"该文档【%s】已导入系统！" % _short_file)
 
+    return {"OK": True, "INFO": u"日报数据导入库中。"}
 
+#

@@ -22,12 +22,15 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 """根据文件命名规则来确定库表名"""
-special_file_name = {u'部署实施':   'devops_task',
-                     u'devops':     'devops_task',
-                     u'【公安】运维': 'ops_task',
-                     u'【运维】北区': 'ops_task_bj',
-                     u'【北区】运维': 'ops_task_bj',
-                     u"details_git": 'git_log',
+special_file_name = {
+    "star_": 'star_task',
+    "details_git": 'git_log',
+    "devopsBJ": 'ops_task_bj',
+    u'部署实施':   'devops_task',
+    u'devops':     'devops_task',
+    u'【公安】运维': 'ops_task',
+    u'【运维】北区': 'ops_task_bj',
+    u'【北区】运维': 'ops_task_bj',
                      }
 
 
@@ -204,7 +207,7 @@ class XlsxHandler:
         return row
 
 
-def doList(xlsx_handler, mongodb, _type, _op, _ncol):
+def doList(xlsx_handler, mongodb, _table, _op, _ncol):
 
     # print("%s- doList ing <%d:%d>" % (time.ctime(), _ncol, xlsx_handler.getNrows()))
 
@@ -237,7 +240,7 @@ def doList(xlsx_handler, mongodb, _type, _op, _ncol):
 
                 # print ">>> update table: ", _type
                 try:
-                    mongodb.handler(_type, 'update', _value, _value)
+                    mongodb.handler(_table, 'update', _value, _value)
                     # print _value
                     _count += 1
                 except Exception, e:
@@ -246,6 +249,7 @@ def doList(xlsx_handler, mongodb, _type, _op, _ncol):
                     print '.',
 
         print "[", _count, "]"
+        return {"OK": True, "INFO": "%d" % _count}
 
 
 def main(filename):
@@ -266,14 +270,14 @@ def main(filename):
         # _table = "star_task"
         _table = xlsx_handler.getTableName()
 
-        doList(xlsx_handler, mongo_db, _table, "APPEND", _ncols)
+        _ret = doList(xlsx_handler, mongo_db, _table, "APPEND", _ncols)
         # print("%s- Done<%s>" % (time.ctime(), _table))
-        return True
+        return _ret
 
     except Exception, e:
         print e
         # print("%s- Done[Nothing to do]" % time.ctime())
-        return False
+        return {"OK": False, "INFO": "%s" % e}
 
 
 if __name__ == '__main__':
