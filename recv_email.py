@@ -17,6 +17,7 @@ import pm_daily
 import star_task
 import duty
 import send_email
+import hashlib
 
 rx_msg_list = []
 
@@ -186,6 +187,12 @@ for _idx in range(_index, 0, -1):
 # 关闭连接
 server.quit()
 
+f = open('email_hash.txt', 'r')
+hash_list = f.read()
+f.close()
+
+_need_rewrite = False
+
 for _msg in rx_msg_list:
 
     if "ret" in _msg:
@@ -196,16 +203,27 @@ for _msg in rx_msg_list:
             _text = "错误提示：邮件 <%s>@<%s> 的附件数据未被导入，原因：<%s>" % (
                 _msg["subject"], _msg["date"], _msg["ret"]["INFO"])
 
-        mail = {
-            "Smtp_Server": "smtp.chinacloud.com.cn",
-            "Smtp_Password": sys.argv[1],
-            "Receivers": [_msg["sender"], "shenwei@chinacloud.com.cn"],
-            "Msg_Title": "An Auto-Reply email by R&D MIS",
-            "Smtp_Sender": "shenwei@chinacloud.com.cn",
-            "From": "shenwei_from@chinacloud.com.cn",
-            "To": _msg["sender"],
-            "Text": _text
-        }
-        send_email.EmailClass(mail).send()
+        _hex = hashlib.md5(_text.encode("utf-8")).hexdigest()
+        if _hex not in hash_list:
+            mail = {
+                "Smtp_Server": "smtp.chinacloud.com.cn",
+                "Smtp_Password": sys.argv[1],
+                "Receivers": [_msg["sender"], "shenwei@chinacloud.com.cn"],
+                "Msg_Title": "An Auto-Reply email by R&D MIS",
+                "Smtp_Sender": "shenwei@chinacloud.com.cn",
+                "From": "shenwei@chinacloud.com.cn",
+                "To": _msg["sender"],
+                "Text": _text
+            }
+            send_email.EmailClass(mail).send()
+            print "need to send it!"
+
+            hash_list += "%s\n" % _hex
+            _need_rewrite = True
+
+if _need_rewrite:
+    f = open('email_hash.txt', 'w')
+    f.write(hash_list)
+    f.close()
 
 #
