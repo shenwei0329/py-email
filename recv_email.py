@@ -114,7 +114,11 @@ def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
                     print u"Subject: %s" % _subject
                 if _ret is not None:
                     """定义邮件回复信息"""
-                    rx_msg_list.append({"sender": _sender, "subject": _subject, "date": _utc_date, "ret": _ret})
+                    rx_msg_list.append({"sender": _sender,
+                                        "subject": _subject,
+                                        "date": _utc_date,
+                                        "file": f_name,
+                                        "ret": _ret})
         else:
             _datas = par.get_payload(decode=True)
             if _datas is None:
@@ -206,11 +210,11 @@ for _msg in rx_msg_list:
 
     if "ret" in _msg:
         if _msg["ret"]["OK"]:
-            _text = "邮件 <%s>@<%s> 的附件数据已被自动导入，处理结果：<%s>" % (
-                _msg["subject"], _msg["date"], _msg["ret"]["INFO"])
+            _text = "R&D MIS系统自动导入邮件 <%s>@<%s> 的附件<%s>数据，处理结果：<%s>" % (
+                _msg["subject"], _msg["date"], _msg["file"], _msg["ret"]["INFO"])
         else:
-            _text = "错误提示：邮件 <%s>@<%s> 的附件数据未被导入，原因：<%s>" % (
-                _msg["subject"], _msg["date"], _msg["ret"]["INFO"])
+            _text = "R&D MIS系统<错误提示>：邮件 <%s>@<%s> 的附件<%s>数据未被导入，原因：<%s>" % (
+                _msg["subject"], _msg["date"], _msg["file"], _msg["ret"]["INFO"])
 
         mail = {
             "Smtp_Server": "smtp.chinacloud.com.cn",
