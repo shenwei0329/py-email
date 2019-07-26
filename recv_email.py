@@ -40,7 +40,7 @@ def parser_date(msg):
         print utcstr
         utcdatetime = datetime.strptime(utcstr, '%d %b %Y %H:%M:%S +0800')
     ti = utcdatetime
-    return "%04d%02d%02d" % (ti.year, ti.month, ti.day)
+    return "%04d%02d%02d" % (ti.year, ti.month, ti.day), utcstr
 
 
 def parser_subject(msg):
@@ -72,7 +72,7 @@ def parser_address(msg):
     return name, addr
 
 
-def parser_content(msg, _cr_date, _sender, _subject):
+def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
     """
     解析邮件正文
     :param msg: 邮件
@@ -114,7 +114,7 @@ def parser_content(msg, _cr_date, _sender, _subject):
                     print u"Subject: %s" % _subject
                 if _ret is not None:
                     """定义邮件回复信息"""
-                    rx_msg_list.append({"sender": _sender, "subject": _subject, "date": _cr_date, "ret": _ret})
+                    rx_msg_list.append({"sender": _sender, "subject": _subject, "date": _utc_date, "ret": _ret})
         else:
             _datas = par.get_payload(decode=True)
             if _datas is None:
@@ -180,13 +180,13 @@ for _idx in range(_index, 0, -1):
                 if not _err:
                     _name, _sender = parser_address(msg)
                     _subject = parser_subject(msg)
-                    _date = parser_date(msg)
+                    _date, _utc_date = parser_date(msg)
                     if _date >= _arg_date:
                         """收取正文和附件"""
-                        _text = u"%s-%s-%s-%s" % (_name, _sender, _subject, _date)
+                        _text = u"%s-%s-%s-%s" % (_name, _sender, _subject, _utc_date)
                         _hex = hashlib.md5(_text.encode("utf-8")).hexdigest()
                         if _hex not in hash_list:
-                            parser_content(msg, _date, _sender, _subject)
+                            parser_content(msg, _date, _utc_date, _sender, _subject)
                             hash_list += "%s\n" % _hex
                             _need_rewrite = True
                     else:
@@ -216,9 +216,9 @@ for _msg in rx_msg_list:
             "Smtp_Server": "smtp.chinacloud.com.cn",
             "Smtp_Password": sys.argv[1],
             "Receivers": [_msg["sender"], "shenwei@chinacloud.com.cn"],
-            "Msg_Title": "An Auto-Reply email by R&D MIS",
+            "Msg_Title": "An Auto-Reply email by R&D MIS-",
             "Smtp_Sender": "shenwei@chinacloud.com.cn",
-            "From": "shenwei@chinacloud.com.cn",
+            "From": "RD-MIS@chinacloud.com.cn",
             "To": _msg["sender"],
             "Text": _text
         }
