@@ -37,8 +37,8 @@ def parser_date(msg):
     try:
         utcdatetime = datetime.strptime(utcstr, '%d %b %Y %H:%M:%S +0000 (GMT)')
     except:
-        print utcstr
-        utcdatetime = datetime.strptime(utcstr, '%d %b %Y %H:%M:%S +0800')
+        _str = utcstr[:str(utcstr).rindex(' ')]
+        utcdatetime = datetime.strptime(_str, '%d %b %Y %H:%M:%S')
     ti = utcdatetime
     return "%04d%02d%02d" % (ti.year, ti.month, ti.day), utcstr
 
