@@ -15,6 +15,7 @@ import sys
 from datetime import datetime, date, timedelta
 import pm_daily
 import star_task
+import approve
 import duty
 import send_email
 import hashlib
@@ -104,10 +105,12 @@ def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
                 """是公司内部邮件"""
                 _ret = None
                 if u"项目日报" in f_name and "doc" in f_name:
-                    print "pm_daily.file_handler:",f_name
+                    print "pm_daily.file_handler:", f_name
                     _ret = pm_daily.file_handler("files/%s" % f_name)
-                elif _subject in [u"代码提交", u"项目经理", u"需求", u"北区运维"]:
+                elif _subject in [u"星任务", u"代码提交", u"项目经理", u"需求", u"北区运维"]:
                     _ret = star_task.file_handler("files/%s" % f_name)
+                elif _subject in [u"审批数据"]:
+                    _ret = approve.file_handler("files/%s" % f_name)
                 elif _subject in [u"考勤"]:
                     _ret = duty.file_handler("files/%s" % f_name)
                 else:
