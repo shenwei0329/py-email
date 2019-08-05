@@ -210,7 +210,8 @@ def main(filename):
     try:
         _str, _ncols = xlsx_handler.getXlsxColStr()
         if _str not in TableName:
-            print(">>> Err: [%s][%s] not be recognised" % (filename, _str))
+            # print(">>> Err: [%s][%s] not be recognised" % (filename, _str))
+            return {"OK": False, "INFO": u">>> Err: [%s][%s] not be recognised" % (filename, _str)}
         _table = TableName[_str].lower()
         _ret = doList(xlsx_handler, mongo_db, _table, "APPEND", _ncols, range(3))
         # print("%s- Done" % time.ctime())
