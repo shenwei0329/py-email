@@ -76,6 +76,7 @@ class XlsxHandler:
         self.tables = self.data.sheets()
         self.table = self.tables[0]
         self.nrows = self.table.nrows
+        self.ncols = self.table.ncols
 
     def getSheetNumber(self):
         return len(self.tables)
@@ -87,6 +88,9 @@ class XlsxHandler:
 
     def getNrows(self):
         return self.nrows
+
+    def getNcols(self):
+        return self.ncols
 
     def getData(self, row, col):
         """
@@ -213,7 +217,7 @@ def main(filename):
             # print(">>> Err: [%s][%s] not be recognised" % (filename, _str))
             return {"OK": False, "INFO": u">>> Err: [%s][%s] not be recognised" % (filename, _str)}
         _table = TableName[_str].lower()
-        _ret = doList(xlsx_handler, mongo_db, _table, "APPEND", _ncols, range(3))
+        _ret = doList(xlsx_handler, mongo_db, _table, "APPEND", _ncols, range(xlsx_handler.getNcols()))
         # print("%s- Done" % time.ctime())
         return _ret
 

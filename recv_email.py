@@ -107,7 +107,16 @@ def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
                 if u"项目日报" in f_name and "doc" in f_name:
                     print "pm_daily.file_handler:", f_name
                     _ret = pm_daily.file_handler("files/%s" % f_name)
-                elif _subject in [u"星任务", u"代码提交", u"项目经理", u"需求", u"北区运维"]:
+                elif _subject in [u"星任务",
+                                  u"代码提交",
+                                  u"项目经理",
+                                  u"需求",
+                                  u"北区运维",
+                                  u"携程",
+                                  u"报销/借款",
+                                  u"报销",
+                                  u"借款",
+                                  u"报账"]:
                     _ret = star_task.file_handler("files/%s" % f_name)
                 elif _subject in [u"审批数据"]:
                     _ret = approve.file_handler("files/%s" % f_name)

@@ -31,6 +31,9 @@ special_file_name = {
     u'【公安】运维': 'ops_task',
     u'【运维】北区': 'ops_task_bj',
     u'【北区】运维': 'ops_task_bj',
+    "plane": 'plane_ticket',
+    "cj_cash": 'loan_req',
+    "cb_cash": 'reimbursement_req',
                      }
 
 
@@ -46,6 +49,13 @@ class XlsxHandler:
         self.data = xlrd.open_workbook(pathname)
         self.tables = self.data.sheets()
         self.table = self.tables[0]
+        self.nrows = self.table.nrows
+
+    def get_tables(self):
+        return self.tables
+
+    def set_table(self, tab_idx):
+        self.table = self.tables[tab_idx]
         self.nrows = self.table.nrows
 
     def isSpecial(self):
@@ -207,7 +217,7 @@ class XlsxHandler:
         return row
 
 
-def doList(xlsx_handler, mongodb, _table, _op, _ncol):
+def doListOne(xlsx_handler, mongodb, _table, _op, _ncol):
 
     # print("%s- doList ing <%d:%d>" % (time.ctime(), _ncol, xlsx_handler.getNrows()))
 
@@ -248,6 +258,22 @@ def doList(xlsx_handler, mongodb, _table, _op, _ncol):
                 finally:
                     print '.',
 
+    return _count
+
+
+def doList(xlsx_handler, mongodb, _table, _op, _ncol):
+
+    _tables = xlsx_handler.get_tables()
+    _count = 0
+    for _tab in _tables:
+        print "...1"
+        _idx = _tables.index(_tab)
+        try:
+            xlsx_handler.set_table(_idx)
+            _count += doListOne(xlsx_handler, mongodb, _table, _op, _ncol)
+        except Exception, e:
+            print e
+        print "...2"
     print "[", _count, "]"
     return {"OK": True, "INFO": u"导入%d条数据" % _count}
 
