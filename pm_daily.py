@@ -185,7 +185,7 @@ def file_handler(_file):
                                                     'summary': _params[1],
                                                     'date': _params[2],
                                                     'percent': _params[3],
-                                                    'member': _params[4],
+                                                    'member': _params[-1],
                                                     'daily_date': _daily['title']['date']
                                                     })
                     elif _heading_lvl == 4:
@@ -200,7 +200,7 @@ def file_handler(_file):
                             _daily['tomorrow'].append({'sub_id': _params[0],
                                                        'summary': _params[1],
                                                        'date': _params[2],
-                                                       'member': _params[3],
+                                                       'member': _params[-1],
                                                        'daily_date': _daily['title']['date']
                                                        })
                     elif _heading_lvl == 5:
