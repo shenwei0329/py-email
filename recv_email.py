@@ -205,10 +205,9 @@ for _idx in range(_index, 0, -1):
                             parser_content(msg, _date, _utc_date, _sender, _subject)
                             hash_list += "%s\n" % _hex
                             _need_rewrite = True
+                            print(u">: [ %s ]" % _subject)
                     else:
                         break
-
-    print("-"*80)
 
 # 关闭连接
 server.quit()
