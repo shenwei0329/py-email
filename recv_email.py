@@ -90,7 +90,7 @@ def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
             value, charset = decode_header(name)[0]
             if charset:
                 value = value.decode(charset)
-            f_name = value
+            f_name = value.replace(" ",'')
             print(">>> %s <<<" % f_name)
             data = par.get_payload(decode=True)
             """以二进制方式写入数据"""
@@ -105,8 +105,13 @@ def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
                 """是公司内部邮件"""
                 _ret = None
                 if u"项目日报" in f_name and "doc" in f_name:
+                    # f_name = f_name.replace(u"项目日报", "PMdaily")
                     print "pm_daily.file_handler:", f_name
-                    _ret = pm_daily.file_handler("files/%s" % f_name)
+                    try:
+                        _ret = pm_daily.file_handler("files/%s" % f_name)
+                    except Exception,e:
+                        print e
+                        _ret = {"OK": False, "INFO": u"文档格式错误，数据无法导入！"}
                 elif _subject in [u"星任务",
                                   u"代码提交",
                                   u"项目经理",
@@ -205,10 +210,9 @@ for _idx in range(_index, 0, -1):
                             parser_content(msg, _date, _utc_date, _sender, _subject)
                             hash_list += "%s\n" % _hex
                             _need_rewrite = True
+                            print(u">: [ %s ]" % _subject)
                     else:
                         break
-
-    print("-"*80)
 
 # 关闭连接
 server.quit()
@@ -240,6 +244,5 @@ for _msg in rx_msg_list:
         }
         send_email.EmailClass(mail).send()
         print "need to send it!"
-
 
 #

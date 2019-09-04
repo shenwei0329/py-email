@@ -47,7 +47,7 @@ def file_handler(_file):
     _short_file = _file.split("\\")[-1]
     # print "fileHandler: ", _short_file
 
-    if ('.docx' not in _short_file) and ('.doc' in _short_file):
+    if ('.doc' not in _short_file):
         print "Invalid file name: ", _short_file
         return {"OK": False, "INFO": "invalid file name"}
     else:
@@ -59,7 +59,16 @@ def file_handler(_file):
         _desc = ""
         _way = ""
 
-        _doc = docx.Document(_file)
+ 
+        _Err = False
+        try:
+            _doc = docx.Document(_file)
+        except Exception,e:
+            print e
+            _Err = True
+
+        if _Err:
+            return {"OK": False, "INFO": u"文档命名错误！"}
 
         _total_target_lvl = 1.1
         _daily = {}
@@ -70,7 +79,7 @@ def file_handler(_file):
             if "Title" in para.style.name:
                 _daily['title'] = {"alias": _params[0], "project_id": _params[2]}
             else:
-                if para.style.name in ["Normal", "List Paragraph"]:
+                if para.style.name in ["Normal", "List Paragraph", "Body", "Body A"]:
 
                     if _heading_lvl == 0 and u"日报" in para.text:
                         _text_lvl = 1
@@ -145,8 +154,8 @@ def file_handler(_file):
                             _daily['stage_target'].append({'sub_id': _params[0],
                                                            'id': _params[1],
                                                            'summary': _params[2],
-                                                           'date': _params[3],
-                                                           'percent': _params[4],
+                                                           'date': _params[-2],
+                                                           'percent': _params[-1],
                                                            'daily_date': _daily['title']['date']
                                                            })
                         elif len(_params) == 7:
@@ -155,11 +164,11 @@ def file_handler(_file):
                                                            'summary': _params[2],
                                                            'requirement': _params[3],
                                                            'method': _params[4],
-                                                           'date': _params[5],
-                                                           'percent': _params[6],
+                                                           'date': _params[-2],
+                                                           'percent': _params[-1],
                                                            'daily_date': _daily['title']['date']
                                                            })
-                        elif len(_params) >=6:
+                        elif len(_params) >= 6:
                             _daily['stage_target'].append({'sub_id': _params[0],
                                                            'id': _params[1],
                                                            'summary': _params[2],
@@ -183,9 +192,9 @@ def file_handler(_file):
                         if len(_params) >= 5:
                             _daily['today'].append({'sub_id': _params[0],
                                                     'summary': _params[1],
-                                                    'date': _params[2],
-                                                    'percent': _params[3],
-                                                    'member': _params[4],
+                                                    'date': _params[-3],
+                                                    'percent': _params[-2],
+                                                    'member': _params[-1],
                                                     'daily_date': _daily['title']['date']
                                                     })
                     elif _heading_lvl == 4:
@@ -199,8 +208,8 @@ def file_handler(_file):
                         if len(_params) >= 4:
                             _daily['tomorrow'].append({'sub_id': _params[0],
                                                        'summary': _params[1],
-                                                       'date': _params[2],
-                                                       'member': _params[3],
+                                                       'date': _params[-2],
+                                                       'member': _params[-1],
                                                        'daily_date': _daily['title']['date']
                                                        })
                     elif _heading_lvl == 5:
@@ -237,7 +246,10 @@ def file_handler(_file):
                             _step = 0
                         _daily['other'].append(para.text)
 
-                if "Heading 1" in para.style.name:
+                if "Heading 1" in para.style.name or\
+                        "Heading" in para.style.name or\
+                        "Body" in para.style.name or\
+                        "Body A" in para.style.name:
                     if u"总体目标" in para.text:
                         _heading_lvl = 1
                         """总体目标完成百分比"""
