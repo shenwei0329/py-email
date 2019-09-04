@@ -7,7 +7,7 @@ echo $DATE
 
 sh << EOF
 
-cd /home/shenwei/Python-dir/
+cd /opt/rdms/py-email/
 
 echo "$mDATE ... ing" >> rx-email.log
 python recv_email.py sw64419 >> rx-email.log

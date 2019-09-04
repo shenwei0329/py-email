@@ -34,6 +34,7 @@ special_file_name = {
     "plane": 'plane_ticket',
     "cj_cash": 'loan_req',
     "cb_cash": 'reimbursement_req',
+    "tower": 'tower',
                      }
 
 

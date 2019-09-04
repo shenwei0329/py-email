@@ -109,9 +109,9 @@ def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
                     print "pm_daily.file_handler:", f_name
                     try:
                         _ret = pm_daily.file_handler("files/%s" % f_name)
-                    except Exception,e:
-                        print e
-                        _ret = {"OK": False, "INFO": u"文档格式错误，数据无法导入！"}
+                    except Exception, e:
+                        print e.message
+                        _ret = {"OK": False, "INFO": u"错误：%s。数据无法导入！" % e.message}
                 elif _subject in [u"星任务",
                                   u"代码提交",
                                   u"项目经理",
@@ -121,7 +121,8 @@ def parser_content(msg, _cr_date, _utc_date, _sender, _subject):
                                   u"报销/借款",
                                   u"报销",
                                   u"借款",
-                                  u"报账"]:
+                                  u"报账",
+                                  u"数据工程"]:
                     _ret = star_task.file_handler("files/%s" % f_name)
                 elif _subject in [u"审批数据"]:
                     _ret = approve.file_handler("files/%s" % f_name)

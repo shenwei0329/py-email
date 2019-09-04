@@ -353,7 +353,8 @@ def file_handler(_file):
                     except Exception, e:
                         print e
         else:
-            print(u"该文档【%s】已导入系统！" % _short_file)
+            print(u"该文档【%s】<%s>已导入系统！" % (_short_file, _t['date']))
+            return {"OK": False, "INFO": u"日期为<%s>的内容已导入" % _t['date']}
 
     return {"OK": True, "INFO": u"完成导入"}
 
